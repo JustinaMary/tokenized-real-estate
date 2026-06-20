@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/*
+  Design system — "Terra"
+  A premium real-estate / fintech aesthetic: deep slate canvas, warm off-white
+  text, an emerald accent for value/money, and a muted gold for highlights.
+*/
+
+:root {
+  --bg: #0b0f14;
+  --bg-elev: #11171f;
+  --bg-card: #131b25;
+  --border: #1f2a37;
+  --border-strong: #2b3a4d;
+  --fg: #eef2f6;
+  --fg-muted: #8c9bab;
+  --fg-faint: #5c6a78;
+  --accent: #34d399; /* emerald */
+  --accent-strong: #10b981;
+  --accent-dim: #0c3b30;
+  --gold: #e7c873;
+  --danger: #f87171;
+  --radius: 14px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-bg-card: var(--bg-card);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-faint: var(--fg-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-dim: var(--accent-dim);
+  --color-gold: var(--gold);
+  --color-danger: var(--danger);
+  --radius-card: var(--radius);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(60rem 40rem at 80% -10%, rgba(52, 211, 153, 0.06), transparent),
+    radial-gradient(50rem 40rem at 0% 0%, rgba(231, 200, 115, 0.04), transparent);
+  background-attachment: fixed;
+}
+
+/* Numbers and addresses read better tabular */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Subtle entrance animation for cards/sections */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 0.4s ease both;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+::selection {
+  background: var(--accent-dim);
+  color: var(--fg);
+}
