@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { getActivity, txUrl, type Activity, type ActivityType } from "@/lib/activity";
+import { getActivity, syncActivity, txUrl, type Activity, type ActivityType } from "@/lib/activity";
 import { Card, Badge } from "./ui";
 
 const LABEL: Record<ActivityType, { text: string; tone: "default" | "accent" | "gold" }> = {
@@ -32,8 +32,10 @@ export function ActivityFeed() {
 
   useEffect(() => {
     if (!address) return;
-    const load = () => setItems(getActivity(address));
+    const load = () => setItems(getActivity(address)); // instant local
     load();
+    // durable: merge the server copy (survives logout/login + devices)
+    syncActivity(address).then(setItems);
     window.addEventListener("terra:activity", load);
     return () => window.removeEventListener("terra:activity", load);
   }, [address]);
