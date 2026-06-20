@@ -1,0 +1,112 @@
+<svg viewBox="0 0 1280 620" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0f14"/>
+      <stop offset="1" stop-color="#0e141c"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#34d399"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1280" height="620" rx="20" fill="url(#bg)"/>
+
+  <!-- header -->
+  <text x="48" y="58" font-size="32" font-weight="700" fill="#eef2f6">How Terra works</text>
+  <text x="48" y="90" font-size="16" fill="#8c9bab">Own real estate by the share — sign in, invest, earn rent, and trade.</text>
+  <g>
+    <rect x="1090" y="36" width="150" height="30" rx="15" fill="#0c3b30" stroke="#34d399" stroke-opacity="0.4"/>
+    <circle cx="1110" cy="51" r="4" fill="#34d399"/>
+    <text x="1122" y="55" font-size="13" fill="#34d399" font-weight="600">Monad Testnet</text>
+  </g>
+
+  <!-- ===== ROW 1 (left to right) ===== -->
+  <!-- 1 Sign in -->
+  <rect x="40" y="140" width="210" height="120" rx="16" fill="#131b25" stroke="#34d399" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="68" cy="168" r="15" fill="#34d399"/><text x="68" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="#06281f">1</text>
+  <text x="145" y="200" text-anchor="middle" font-size="30">🔑</text>
+  <text x="145" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Sign in</text>
+  <text x="145" y="249" text-anchor="middle" font-size="10.5" fill="#8c9bab">Email / passkey · no seed phrase</text>
+
+  <!-- 2 Get gas -->
+  <rect x="288" y="140" width="210" height="120" rx="16" fill="#131b25" stroke="#34d399" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="316" cy="168" r="15" fill="#34d399"/><text x="316" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="#06281f">2</text>
+  <text x="393" y="200" text-anchor="middle" font-size="30">⛽</text>
+  <text x="393" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Get gas</text>
+  <text x="393" y="249" text-anchor="middle" font-size="10.5" fill="#8c9bab">Testnet MON auto-funded</text>
+
+  <!-- 3 Mint mUSDC -->
+  <rect x="536" y="140" width="210" height="120" rx="16" fill="#131b25" stroke="#e7c873" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="564" cy="168" r="15" fill="#e7c873"/><text x="564" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="#3a2e07">3</text>
+  <text x="641" y="200" text-anchor="middle" font-size="30">💵</text>
+  <text x="641" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Mint mUSDC</text>
+  <text x="641" y="249" text-anchor="middle" font-size="10.5" fill="#8c9bab">Free test dollars to invest</text>
+
+  <!-- 4 Verify -->
+  <rect x="784" y="140" width="210" height="120" rx="16" fill="#131b25" stroke="#e7c873" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="812" cy="168" r="15" fill="#e7c873"/><text x="812" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="#3a2e07">4</text>
+  <text x="889" y="200" text-anchor="middle" font-size="30">🛡️</text>
+  <text x="889" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Verify (KYC)</text>
+  <text x="889" y="249" text-anchor="middle" font-size="10.5" fill="#8c9bab">On-chain compliance gate</text>
+
+  <!-- 5 Buy shares -->
+  <rect x="1032" y="140" width="210" height="120" rx="16" fill="#131b25" stroke="#34d399" stroke-opacity="0.7" stroke-width="2"/>
+  <circle cx="1060" cy="168" r="15" fill="#34d399"/><text x="1060" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="#06281f">5</text>
+  <text x="1137" y="200" text-anchor="middle" font-size="30">🏠</text>
+  <text x="1137" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Buy shares</text>
+  <text x="1137" y="249" text-anchor="middle" font-size="10.5" fill="#8c9bab">Own a fraction of a property</text>
+
+  <!-- row1 arrows -->
+  <line x1="252" y1="200" x2="286" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="500" y1="200" x2="534" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="748" y1="200" x2="782" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="996" y1="200" x2="1030" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- down arrow 5 -> 6 -->
+  <line x1="1137" y1="262" x2="1137" y2="356" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ===== ROW 2 (right to left) ===== -->
+  <!-- 6 Earn rent -->
+  <rect x="1032" y="360" width="210" height="120" rx="16" fill="#131b25" stroke="#e7c873" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="1060" cy="388" r="15" fill="#e7c873"/><text x="1060" y="393" text-anchor="middle" font-size="15" font-weight="700" fill="#3a2e07">6</text>
+  <text x="1137" y="420" text-anchor="middle" font-size="30">💰</text>
+  <text x="1137" y="450" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Earn rent</text>
+  <text x="1137" y="469" text-anchor="middle" font-size="10.5" fill="#8c9bab">Income split pro-rata</text>
+
+  <!-- 7 Claim rent -->
+  <rect x="784" y="360" width="210" height="120" rx="16" fill="#131b25" stroke="#e7c873" stroke-opacity="0.45" stroke-width="1.5"/>
+  <circle cx="812" cy="388" r="15" fill="#e7c873"/><text x="812" y="393" text-anchor="middle" font-size="15" font-weight="700" fill="#3a2e07">7</text>
+  <text x="889" y="420" text-anchor="middle" font-size="30">🤑</text>
+  <text x="889" y="450" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">Claim rent</text>
+  <text x="889" y="469" text-anchor="middle" font-size="10.5" fill="#8c9bab">Withdraw anytime</text>
+
+  <!-- 8 List & trade -->
+  <rect x="536" y="360" width="210" height="120" rx="16" fill="#131b25" stroke="#34d399" stroke-opacity="0.7" stroke-width="2"/>
+  <circle cx="564" cy="388" r="15" fill="#34d399"/><text x="564" y="393" text-anchor="middle" font-size="15" font-weight="700" fill="#06281f">8</text>
+  <text x="641" y="420" text-anchor="middle" font-size="30">🔁</text>
+  <text x="641" y="450" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">List &amp; trade</text>
+  <text x="641" y="469" text-anchor="middle" font-size="10.5" fill="#8c9bab">Sell shares on the market</text>
+
+  <!-- payoff -->
+  <rect x="288" y="360" width="210" height="120" rx="16" fill="#0c3b30" stroke="#34d399" stroke-opacity="0.45" stroke-width="1.5"/>
+  <text x="393" y="420" text-anchor="middle" font-size="30">💸</text>
+  <text x="393" y="450" text-anchor="middle" font-size="16" font-weight="600" fill="#eef2f6">You get paid</text>
+  <text x="393" y="469" text-anchor="middle" font-size="10.5" fill="#8c9bab">Buyers fill your listing</text>
+
+  <!-- row2 arrows (pointing left) -->
+  <line x1="1030" y1="420" x2="996" y2="420" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="782" y1="420" x2="748" y2="420" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="534" y1="420" x2="500" y2="420" stroke="#34d399" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- footer: always-on layers -->
+  <rect x="40" y="520" width="1202" height="64" rx="14" fill="#11171f" stroke="#1f2a37"/>
+  <text x="66" y="548" font-size="20">📊</text>
+  <text x="96" y="546" font-size="14" font-weight="600" fill="#eef2f6">Dashboard</text>
+  <text x="96" y="565" font-size="11.5" fill="#8c9bab">tracks holdings, claimable rent &amp; on-chain activity</text>
+
+  <line x1="640" y1="534" x2="640" y2="570" stroke="#1f2a37"/>
+
+  <text x="700" y="548" font-size="20">✦</text>
+  <text x="730" y="546" font-size="14" font-weight="600" fill="#eef2f6">AI copilot</text>
+  <text x="730" y="565" font-size="11.5" fill="#8c9bab">answers questions &amp; proposes buy / claim / list actions you sign</text>
+</svg>

@@ -33,15 +33,9 @@ This is the whole journey, start to finish. Each step maps to a real on-chain
 action — and each has a manual test case in
 [docs/testing/core-investing-flow-test-plan.md](docs/testing/core-investing-flow-test-plan.md).
 
-```
- Sign in ──▶ Get gas ──▶ Mint mUSDC ──▶ Verify (KYC) ──▶ Buy shares
-                                                              │
-                                                              ▼
-   Track on Dashboard ◀── Claim rent ◀── Earn rent ◀── (you now own shares)
-        │
-        ▼
-   List shares ──▶ Someone buys them ──▶ you get paid
-```
+<p align="center">
+  <img src="docs/assets/flow.svg" alt="Terra user flow: sign in, get gas, mint mUSDC, verify KYC, buy shares, earn rent, claim, list and trade" width="100%">
+</p>
 
 | # | Step | What happens | Where |
 |---|------|--------------|-------|
