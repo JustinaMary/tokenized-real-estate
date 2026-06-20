@@ -43,7 +43,11 @@ export function BuyPrimaryBox({
     }
     const ok = await run(
       { ...propertyShares, functionName: "buyPrimary", args: [BigInt(id), shares] },
-      { pending: "Buying shares…", success: "Shares purchased" }
+      {
+        pending: "Buying shares…",
+        success: "Shares purchased",
+        activity: { type: "buy", title: `Bought ${shares} shares · property #${id}` },
+      }
     );
     if (ok) {
       await refetch();
@@ -88,7 +92,14 @@ export function ClaimButton({
   async function onClaim() {
     const ok = await run(
       { ...propertyShares, functionName: "claimRent", args: [BigInt(id)] },
-      { pending: "Claiming rent…", success: "Rent claimed" }
+      {
+        pending: "Claiming rent…",
+        success: "Rent claimed",
+        activity: {
+          type: "claim",
+          title: `Claimed ${formatUSDC(claimable)} mUSDC rent · property #${id}`,
+        },
+      }
     );
     if (ok) onDone?.();
   }
@@ -140,7 +151,11 @@ export function ListSharesForm({
         functionName: "list",
         args: [BigInt(id), shares, parseUSDC(price)],
       },
-      { pending: "Creating listing…", success: "Listing created" }
+      {
+        pending: "Creating listing…",
+        success: "Listing created",
+        activity: { type: "list", title: `Listed ${shares} shares · property #${id}` },
+      }
     );
     if (ok) {
       setAmount("");
@@ -205,7 +220,11 @@ export function BuyListingButton({
     }
     const ok = await run(
       { ...marketplace, functionName: "buy", args: [BigInt(listing.id), shares] },
-      { pending: "Buying shares…", success: "Purchase complete" }
+      {
+        pending: "Buying shares…",
+        success: "Purchase complete",
+        activity: { type: "trade", title: `Bought ${shares} shares · listing #${listing.id}` },
+      }
     );
     if (ok) {
       setAmount("");
@@ -251,7 +270,11 @@ export function CancelListingButton({
   async function onCancel() {
     const ok = await run(
       { ...marketplace, functionName: "cancel", args: [BigInt(listingId)] },
-      { pending: "Cancelling…", success: "Listing cancelled" }
+      {
+        pending: "Cancelling…",
+        success: "Listing cancelled",
+        activity: { type: "cancel", title: `Cancelled listing #${listingId}` },
+      }
     );
     if (ok) onDone?.();
   }

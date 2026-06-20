@@ -23,7 +23,11 @@ export default function FaucetPage() {
   async function onFaucet() {
     const ok = await run(
       { ...mockUSDC, functionName: "faucet", args: [] },
-      { pending: "Minting mUSDC…", success: "Received 10,000 mUSDC" }
+      {
+        pending: "Minting mUSDC…",
+        success: "Received 10,000 mUSDC",
+        activity: { type: "faucet", title: "Minted 10,000 mUSDC" },
+      }
     );
     if (ok) refetch();
   }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useCompliance } from "@/lib/useCompliance";
 import { toast } from "@/lib/toast";
+import { recordActivity } from "@/lib/activity";
 import { Button, Card, Field, Input, Badge, Spinner } from "@/components/ui";
 import { ConfigBanner } from "@/components/ConfigBanner";
 
@@ -32,6 +33,13 @@ export default function VerifyPage() {
       const data = await res.json();
       if (data.ok) {
         toast(`${tab.toUpperCase()} verification approved`, "success");
+        if (data.txHash && address) {
+          recordActivity(address, {
+            type: "kyc",
+            title: `${tab.toUpperCase()} verification approved`,
+            txHash: data.txHash,
+          });
+        }
         refetch();
       } else {
         toast(data.reason ?? data.error ?? "Verification failed", "error");
