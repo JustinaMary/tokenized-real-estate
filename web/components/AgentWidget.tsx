@@ -99,8 +99,15 @@ export function AgentWidget() {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
   }, [messages, loading, pendingAction]);
 
-  async function send() {
-    const text = input.trim();
+  const SUGGESTIONS = [
+    "What properties can I invest in?",
+    "Which has the best rental yield?",
+    "How much rent can I claim?",
+    "Buy 50 shares of the cheapest property",
+  ];
+
+  async function send(preset?: string) {
+    const text = (preset ?? input).trim();
     if (!text || loading) return;
     const next = [...messages, { role: "user" as const, content: text }];
     setMessages(next);
@@ -228,6 +235,20 @@ export function AgentWidget() {
                 {m.role === "assistant" ? <MessageText text={m.content} /> : m.content}
               </div>
             ))}
+
+            {messages.length === 1 && !loading && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => send(s)}
+                    className="rounded-full border border-border-strong px-3 py-1.5 text-xs text-fg-muted transition-colors hover:border-accent/40 hover:text-fg"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {loading && (
               <div className="flex items-center gap-2 text-sm text-fg-faint">
