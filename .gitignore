@@ -1,0 +1,38 @@
+# Skills tooling — do not commit (per project owner)
+.agents/
+skills-lock.json
+.claude/
+
+# Node
+node_modules/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js / web
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+.vercel/
+
+# Env / secrets
+.env
+.env*.local
+*.env
+!.env.example
+
+# Foundry / contracts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/
+
+# Misc
+.DS_Store
+*.log
+.idea/
+.vscode/
+scratchpad/
