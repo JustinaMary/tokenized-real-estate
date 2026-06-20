@@ -279,7 +279,7 @@ export function AgentWidget() {
                 placeholder="Ask about properties or your portfolio…"
                 className="flex-1 rounded-lg border border-border bg-bg-elev px-3 py-2 text-sm text-fg placeholder:text-fg-faint focus:border-accent/50 focus:outline-none"
               />
-              <Button onClick={send} loading={loading} disabled={!input.trim()}>
+              <Button onClick={() => send()} loading={loading} disabled={!input.trim()}>
                 Send
               </Button>
             </div>
