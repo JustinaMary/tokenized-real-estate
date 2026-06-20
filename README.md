@@ -158,6 +158,19 @@ the frontend reads status from the registry and unlocks investing.
   already holds `VERIFIER_ROLE` and is verified by the deploy script) and
   `NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS`. Keep the verifier key funded with MON.
 
+## AI copilot
+
+A floating **Claude-powered copilot** ([components/AgentWidget.tsx](web/components/AgentWidget.tsx),
+[app/api/agent/chat](web/app/api/agent/chat/route.ts)) reads the connected
+user's on-chain portfolio + property data and answers questions, recommends
+properties, and **proposes actions** (buy, claim rent, list) that the user
+confirms and signs in their own wallet — the agent never holds keys.
+
+- Model: `claude-opus-4-8` via the Anthropic SDK, with tool-use for structured
+  action proposals executed through the existing wagmi flows.
+- Set `ANTHROPIC_API_KEY` (server-only) to enable it; without it the widget
+  shows a "not configured" message and the rest of the app is unaffected.
+
 ## Roadmap
 
 - Envio HyperIndex activity feed, IPFS metadata pinning, permissioned

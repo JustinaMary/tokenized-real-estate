@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { Header } from "@/components/Header";
 import { NetworkBanner } from "@/components/NetworkBanner";
 import { GasOnboard } from "@/components/GasOnboard";
+import { AgentWidget } from "@/components/AgentWidget";
 import { Toaster } from "@/components/Toaster";
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default function RootLayout({
             </div>
           </footer>
           <GasOnboard />
+          <AgentWidget />
           <Toaster />
         </Providers>
       </body>
