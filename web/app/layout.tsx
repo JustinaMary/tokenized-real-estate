@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
 import { NetworkBanner } from "@/components/NetworkBanner";
+import { GasOnboard } from "@/components/GasOnboard";
 import { Toaster } from "@/components/Toaster";
 
 const geistSans = Geist({
@@ -44,6 +45,7 @@ export default function RootLayout({
               <span className="tabular">Demo — not investment advice</span>
             </div>
           </footer>
+          <GasOnboard />
           <Toaster />
         </Providers>
       </body>
