@@ -1,179 +1,222 @@
-# Terra — Tokenized Real Estate on Monad
+# 🏠 Terra — Tokenized Real Estate on Monad
 
-Fractional ownership of real estate, settled on **Monad testnet**. A property is
-divided into thousands of shares; investors buy shares with a mock USDC
-stablecoin, earn a proportional cut of rental income, and trade shares on a
-fixed-price marketplace.
+**Own a fraction of real estate. Earn the rent. Trade anytime.**
 
-> Monad Blitz Mumbai submission. Built with the `monskill` stack.
+Terra turns a property into thousands of on-chain shares. Instead of needing
+₹1 crore to buy a flat, you can buy a few shares for a few dollars, receive your
+slice of the rental income, and sell your shares whenever you want — all settled
+on **Monad**.
 
-## What it does
+> 🏆 Monad Blitz Mumbai submission. Built with the `monskill` stack.
+> _Demo / testnet only — not investment advice._
 
-- **Tokenize** a property as an ERC-1155 token with a fixed share supply.
-- **Invest** — buy shares from the primary market with mUSDC.
-- **Earn rent** — the issuer deposits rental income; holders claim their
-  pro-rata share (gas-safe pull-based dividends).
-- **Trade** — list and buy shares on an escrow-less fixed-price marketplace
-  (partial fills supported).
-- **Dashboard** — portfolio value, claimable rent, and active listings.
+---
 
-## Architecture
+## 🔗 Live on Monad Testnet
+
+Everything is deployed and verified on Monad testnet (chain id **10143**).
+
+| Contract | Address |
+|----------|---------|
+| ComplianceRegistry | `0x61E3b60A0Ed2Ea3afA4170b9d54c52915f3AE06C` |
+| MockUSDC (mUSDC) | `0x19DC796A7ecD01E798bd00920a5b96f872C82d57` |
+| PropertyShares | `0x61d3eFc64FBC0070418A925d5cfFC318B3B8983a` |
+| Marketplace | `0xacAC85fD3bCDa4b74CfFdB114701590A47D49705` |
+
+Explorer: **https://testnet.monadexplorer.com** · RPC: `https://testnet-rpc.monad.xyz`
+
+---
+
+## 👤 The user flow (what actually happens)
+
+This is the whole journey, start to finish. Each step maps to a real on-chain
+action — and each has a manual test case in
+[docs/testing/core-investing-flow-test-plan.md](docs/testing/core-investing-flow-test-plan.md).
+
+```
+ Sign in ──▶ Get gas ──▶ Mint mUSDC ──▶ Verify (KYC) ──▶ Buy shares
+                                                              │
+                                                              ▼
+   Track on Dashboard ◀── Claim rent ◀── Earn rent ◀── (you now own shares)
+        │
+        ▼
+   List shares ──▶ Someone buys them ──▶ you get paid
+```
+
+| # | Step | What happens | Where |
+|---|------|--------------|-------|
+| 1 | **Sign in** | Email / passkey / social via **Para** → you get an embedded wallet, no seed phrase. (External wallets like MetaMask/Rabby also work.) | Header → *Sign in* |
+| 2 | **Get gas** | A new wallet is **auto-funded with testnet MON** for gas on first connect — no manual faucet hunting. | automatic (or *Faucet*) |
+| 3 | **Mint mUSDC** | Click once to mint **10,000 mock USDC** — the money you invest with. | *Faucet* |
+| 4 | **Verify identity** | Complete **KYC** (individual) or **KYB** (business). This is **enforced on-chain** — you can't own shares without it. | *Verify* |
+| 5 | **Buy shares** | Pick a property, buy shares from the primary sale. mUSDC goes to the issuer, shares come to you. | *Marketplace → property → Invest* |
+| 6 | **Earn rent** | The property issuer deposits rental income; it's split across all shareholders automatically (pro-rata). | issuer action |
+| 7 | **Claim rent** | Withdraw your accrued rent whenever you like (gas-safe pull model). | *Dashboard / property → Claim* |
+| 8 | **Trade** | List your shares at a price; any verified buyer can fill (full or partial). Cancel anytime. | *property → Sell shares* |
+| 9 | **Track** | See your portfolio value, claimable rent, active listings, and a feed of your on-chain transactions (with explorer links). | *Dashboard* |
+| 10 | **Ask the copilot** | A Claude AI assistant answers questions about your portfolio and can **propose** buy/claim/list actions you confirm and sign. | ✦ button |
+
+> 💡 **Common gotcha:** minting mUSDC gives you *money*, not *shares*. You must
+> **buy** shares first; only then does the **Sell shares / Approve & List**
+> option appear. And buying requires being **KYC-verified**.
+
+---
+
+## ✨ Features
+
+- **Fractional ownership** — each property is an ERC-1155 token with a fixed
+  share supply.
+- **Rental income** — gas-safe pull-based dividends; claim your share anytime.
+- **Secondary marketplace** — escrow-less fixed-price listings with partial fills.
+- **On-chain KYC/KYB compliance** — share ownership is gated at the token level.
+- **Seedless onboarding** — Para embedded wallets (email/passkey) + auto gas drip.
+- **AI investing copilot** — Claude-powered, reads your real on-chain state.
+- **Investor dashboard** — holdings, claimable rent, listings, activity feed.
+
+---
+
+## 🏗️ How it works
 
 | Layer | Tech |
 |-------|------|
-| Contracts | Solidity + Foundry + OpenZeppelin → Monad testnet (10143) |
-| Off-chain backend | Next.js API routes → Neon Postgres (static seed fallback) |
+| Smart contracts | Solidity + Foundry + OpenZeppelin → Monad testnet |
 | Frontend | Next.js 16 (App Router) + Wagmi v3 + viem + Tailwind v4 |
+| Off-chain backend | Next.js API routes → Neon Postgres (falls back to a static seed) |
+| Auth | Para (embedded MPC wallets) |
+| AI | Anthropic Claude (`claude-opus-4-8`) |
 | Hosting | Vercel (web) · Neon (DB) · Monad testnet (contracts) |
 
+### Smart contracts
+
+- **MockUSDC** — ERC-20 test stablecoin (6 decimals) with a public `faucet()`.
+- **PropertyShares** — ERC-1155, one token id per property. Rent is distributed
+  via an `accRentPerShare` accumulator; `_update` is overridden to checkpoint
+  rent on every transfer (so trading never strands or double-pays rent) **and**
+  to enforce the compliance gate (only verified addresses can receive shares).
+- **Marketplace** — escrow-less fixed-price listings; shares stay in the
+  seller's wallet (approved via `setApprovalForAll`) and move directly
+  seller → buyer on fill.
+- **ComplianceRegistry** — ERC-3643-style allowlist of KYC/KYB-verified
+  addresses, written by a backend `VERIFIER` role.
+
+✅ **33 Foundry tests** cover supply caps, rent math, rent conservation across
+transfers, compliance gating, and marketplace fills/cancels.
+
+### Project structure
+
 ```
-contracts/   Foundry project — MockUSDC, PropertyShares, Marketplace (+ tests)
-web/         Next.js app — UI + API routes
-docs/        Design spec
-```
-
-### Contracts
-
-- **MockUSDC** — ERC-20 (6 decimals) test stablecoin with a public `faucet()`.
-- **PropertyShares** — ERC-1155; one token id per property. Pull-based rent
-  dividends via an `accRentPerShare` accumulator, with `_update` overridden to
-  checkpoint rent on every transfer so trading and rent accrual stay correct.
-- **Marketplace** — escrow-less fixed-price listings with partial fills; shares
-  stay in the seller's wallet (approved via `setApprovalForAll`) and move
-  directly seller → buyer on fill.
-
-22 Foundry tests cover supply caps, rent math, rent conservation across
-transfers, and marketplace fills/cancels.
-
-## Quick start
-
-### 1. Contracts — test
-
-```bash
-cd contracts
-forge test
+contracts/   Foundry — MockUSDC, PropertyShares, Marketplace, ComplianceRegistry (+ tests)
+web/         Next.js app — UI pages, API routes, AI copilot
+docs/        Design specs + the QA test plan
 ```
 
-### 2. Contracts — deploy to Monad testnet
+---
 
-You need a testnet private key funded with MON (from https://faucet.monad.xyz).
+## 🚀 Run it locally
 
-```bash
-cd contracts
-export MONAD_TESTNET_RPC_URL=https://testnet-rpc.monad.xyz
-forge script script/Deploy.s.sol \
-  --rpc-url $MONAD_TESTNET_RPC_URL \
-  --broadcast \
-  --private-key $PRIVATE_KEY
-```
-
-The script prints the three deployed addresses. (For multisig/agent-wallet
-deployment, see the `monskill` `wallet/` skill.)
-
-### 3. Verify (all explorers, one call)
-
-```bash
-forge verify-contract <ADDR> src/PropertyShares.sol:PropertyShares \
-  --chain 10143 --show-standard-json-input > /tmp/standard-input.json
-# then POST to https://agents.devnads.com/v1/verify (see monskill scaffold skill)
-```
-
-### 4. Frontend
+The contracts are already deployed, so you only need the web app:
 
 ```bash
 cd web
-cp .env.example .env.local   # paste the deployed addresses
+cp .env.example .env.local     # fill in the values below
 npm install
 npm run dev
 ```
 
-Open http://localhost:3000, connect a wallet (MetaMask/Rabby on Monad testnet),
-mint mUSDC from the **Faucet**, then invest.
+Open **http://localhost:3000**, click **Sign in**, then follow the user flow above.
 
-## Configuration
-
-`web/.env.local`:
-
-| Var | Purpose |
-|-----|---------|
-| `NEXT_PUBLIC_MOCK_USDC_ADDRESS` | deployed MockUSDC |
-| `NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS` | deployed PropertyShares |
-| `NEXT_PUBLIC_MARKETPLACE_ADDRESS` | deployed Marketplace |
-| `NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS` | deployed ComplianceRegistry |
-| `NEXT_PUBLIC_MONAD_TESTNET_RPC_URL` | RPC (optional) |
-| `DATABASE_URL` | Neon Postgres (optional — falls back to a static seed) |
-| `VERIFIER_PRIVATE_KEY` | server-only; signer with `VERIFIER_ROLE`, funded with MON |
-| `BRALE_API_KEY` | server-only; optional, swaps mock KYC → Brale |
-
-The app runs fully without a database: property metadata falls back to a static
-seed keyed by token id. Connect Neon to persist issuer-created properties.
-
-## Deploy to Vercel
-
-Import `web/` as a Vercel project. Set the env vars above (and add a Neon
-integration for `DATABASE_URL`). The Next.js API routes deploy as serverless
-functions — no separate backend.
-
-## Auth: email / social / passkey (Para)
-
-Para is **already wired in** ([app/providers-para.tsx](web/app/providers-para.tsx),
-[components/ParaConnectButton.tsx](web/components/ParaConnectButton.tsx)) with
-Monad testnet on `externalWalletConfig`. It activates automatically once a Para
-API key is present; without one the app falls back to injected-wallet connect, so
-it always runs.
-
-To switch on email/social/passkey sign-in:
+Minimum `web/.env.local` to talk to the live deployment:
 
 ```bash
-npm install -g @getpara/cli
-para login                 # browser OAuth — only you can complete this
-cd web && para init --no-input
-para keys create -n terra-dev --display-name "Terra (dev)"
-# put the PUBLIC key in web/.env.local:
-#   NEXT_PUBLIC_PARA_API_KEY=<public-key>
-para doctor                # verify the integration
-npm run dev
+NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS=0x61E3b60A0Ed2Ea3afA4170b9d54c52915f3AE06C
+NEXT_PUBLIC_MOCK_USDC_ADDRESS=0x19DC796A7ecD01E798bd00920a5b96f872C82d57
+NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS=0x61d3eFc64FBC0070418A925d5cfFC318B3B8983a
+NEXT_PUBLIC_MARKETPLACE_ADDRESS=0xacAC85fD3bCDa4b74CfFdB114701590A47D49705
+NEXT_PUBLIC_MONAD_TESTNET_RPC_URL=https://testnet-rpc.monad.xyz
+VERIFIER_PRIVATE_KEY=<key with VERIFIER_ROLE, funded with MON>   # enables KYC writes + gas drip
+NEXT_PUBLIC_PARA_API_KEY=<para public key>                       # enables email/passkey sign-in
+# optional:
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=<reown project id>          # external-wallet connect
+ANTHROPIC_API_KEY=<anthropic key>                                # enables the AI copilot
+DATABASE_URL=<neon postgres url>                                 # persists issuer-created properties
+BRALE_API_KEY=<brale key>                                        # swaps mock KYC → Brale
 ```
 
-The header button becomes **Sign in** and opens the Para modal (Google, Apple,
-Discord, X, Facebook, Farcaster, email, passkey, or external wallet).
+### Configuration reference
 
-## Compliance: KYC / KYB
+| Var | Required? | Purpose |
+|-----|-----------|---------|
+| `NEXT_PUBLIC_*_ADDRESS` (×4) | ✅ | Deployed contract addresses |
+| `VERIFIER_PRIVATE_KEY` | ✅ for KYC | Server signer with `VERIFIER_ROLE`, funded with MON. Also powers the gas drip. |
+| `NEXT_PUBLIC_PARA_API_KEY` | recommended | Email/passkey/social sign-in. Without it: injected-wallet connect. |
+| `NEXT_PUBLIC_MONAD_TESTNET_RPC_URL` | optional | RPC (defaults to the public endpoint) |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | optional | External-wallet connect (free at cloud.reown.com) |
+| `ANTHROPIC_API_KEY` | optional | AI copilot (server-only) |
+| `DATABASE_URL` | optional | Neon Postgres; app uses a static seed without it |
+| `BRALE_API_KEY` | optional | Real KYC via Brale instead of the mock provider |
 
-Share ownership is gated on-chain. `ComplianceRegistry` is an identity allowlist
-(ERC-3643-style) tracking KYC (individuals) and KYB (businesses); `PropertyShares`
-checks it in `_update`, so **both primary buys and secondary trades require a
-verified recipient** — enforced at the token level, not just in the UI. Claiming
-rent and selling/exiting stay open.
+> Anything marked optional degrades gracefully — the app still runs, the feature
+> just shows a friendly "not configured" state.
 
-Flow: a user submits the `/verify` form → `POST /api/kyc/verify` runs a provider
-→ on approval, a backend signer (`VERIFIER_ROLE`) writes the result on-chain →
-the frontend reads status from the registry and unlocks investing.
+---
 
-- **Provider:** mock by default (no real PII); set `BRALE_API_KEY` to switch to
-  Brale (regulated KYC/KYB + stablecoins, documented on Monad). The
-  `lib/kyc/provider.ts` interface lets any provider (TransFi, Banxa, zerohash…)
-  slot in.
-- **Setup:** set `VERIFIER_PRIVATE_KEY` (use the deployer key for the demo; it
-  already holds `VERIFIER_ROLE` and is verified by the deploy script) and
-  `NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS`. Keep the verifier key funded with MON.
+## 🛠️ Deploy from scratch (optional)
 
-## AI copilot
+Already deployed — only needed if you want your own instance.
 
-A floating **Claude-powered copilot** ([components/AgentWidget.tsx](web/components/AgentWidget.tsx),
-[app/api/agent/chat](web/app/api/agent/chat/route.ts)) reads the connected
-user's on-chain portfolio + property data and answers questions, recommends
-properties, and **proposes actions** (buy, claim rent, list) that the user
-confirms and signs in their own wallet — the agent never holds keys.
+```bash
+# 1. Test the contracts
+cd contracts && forge test
 
-- Model: `claude-opus-4-8` via the Anthropic SDK, with tool-use for structured
-  action proposals executed through the existing wagmi flows.
-- Set `ANTHROPIC_API_KEY` (server-only) to enable it; without it the widget
-  shows a "not configured" message and the rest of the app is unaffected.
+# 2. Deploy to Monad testnet (needs a key funded with MON)
+export MONAD_TESTNET_RPC_URL=https://testnet-rpc.monad.xyz
+forge script script/Deploy.s.sol \
+  --rpc-url $MONAD_TESTNET_RPC_URL --broadcast --private-key $PRIVATE_KEY
+# prints all 4 addresses + seeds 3 demo properties + verifies the deployer
 
-## Roadmap
+# 3. Verify on the explorers (one API call per contract) — see monskill scaffold skill
+# 4. Put the 4 addresses + VERIFIER_PRIVATE_KEY into web/.env.local
+```
 
-- Envio HyperIndex activity feed, IPFS metadata pinning, permissioned
-  multi-issuer support.
+The deployer becomes the contract **owner**, the property **issuer**, and the
+KYC **verifier** — use that same key as `VERIFIER_PRIVATE_KEY`.
 
-_Demo only — not investment advice._
+### Deploy the web app
+
+Import `web/` into **Vercel**, set the env vars above (add a Neon integration
+for `DATABASE_URL`). The Next.js API routes deploy as serverless functions — no
+separate backend to run.
+
+---
+
+## 🔐 Notable design choices
+
+- **Compliance is on-chain, not just UI.** `PropertyShares._update` calls the
+  ComplianceRegistry, so an unverified address can't receive shares even by
+  calling the contract directly. Claiming rent and exiting (selling) stay open.
+  The KYC provider is pluggable (`lib/kyc/provider.ts`) — mock by default,
+  Brale-ready, and TransFi/Banxa/zerohash can slot in.
+- **No gas friction.** New wallets are auto-topped-up with testnet MON via
+  `/api/gas/drip` (swap the faucet for a paymaster in production).
+- **The AI agent never holds keys.** It reads on-chain state and *proposes*
+  actions; you confirm and sign each one in your own wallet.
+- **Graceful degradation everywhere.** Para, the database, the copilot, and
+  WalletConnect are all optional — the app runs without any of them.
+
+---
+
+## ✅ Testing
+
+- **Automated:** `cd contracts && forge test` (33 passing tests).
+- **Manual end-to-end:** follow
+  [docs/testing/core-investing-flow-test-plan.md](docs/testing/core-investing-flow-test-plan.md)
+  — a step-by-step QA checklist for the full browser flow.
+
+---
+
+## 🗺️ Roadmap
+
+- Envio HyperIndex for a global, cross-device activity feed
+- IPFS pinning for property metadata + images
+- Permissioned multi-issuer support
+- Cross-chain funding (bring USDC onto Monad via a bridge)
