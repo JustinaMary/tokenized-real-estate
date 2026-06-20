@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
+import { NetworkBanner } from "@/components/NetworkBanner";
 import { Toaster } from "@/components/Toaster";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <Header />
+          <NetworkBanner />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-border mt-24">
             <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-fg-faint flex flex-wrap items-center justify-between gap-3">
