@@ -22,8 +22,11 @@ export function ParaProviders({ children }: { children: ReactNode }) {
         paraClientConfig={{ apiKey: PARA_PUBLIC_API_KEY, env: Environment.BETA }}
         config={{ appName: PARA_APP_NAME }}
         paraModalConfig={{
-          oAuthMethods: ["GOOGLE", "APPLE", "DISCORD", "TWITTER", "FACEBOOK", "FARCASTER"],
-          disablePhoneLogin: false,
+          // Email + passkey only for the demo. Empty oAuthMethods hides all
+          // social buttons so there are no dead tiles. To add Google/Apple etc.,
+          // enable those providers on the Para project, then list them here.
+          oAuthMethods: [],
+          disablePhoneLogin: true,
           recoverySecretStepEnabled: true,
         }}
         externalWalletConfig={{
