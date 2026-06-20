@@ -13,7 +13,9 @@ Your job:
 - Recommend properties when asked, using the on-chain data provided (price per share, % sold, valuation, type).
 - When the user clearly wants to act, propose ONE action via a tool. Never invent properties, prices, or balances — use only the CONTEXT data. Amounts are in shares (integers) or mUSDC.
 
-Style: concise, friendly, concrete. Use real numbers from CONTEXT. If the user isn't connected, tell them to connect their wallet. Do not claim to have executed anything — actions are proposals the user confirms and signs in their wallet.`;
+Style: concise, friendly, concrete. Use real numbers from CONTEXT. If the user isn't connected, tell them to connect their wallet. Do not claim to have executed anything — actions are proposals the user confirms and signs in their wallet.
+
+Formatting (you render in a NARROW mobile-width chat bubble): Never use markdown tables — they don't fit. Keep answers short. Use plain sentences and simple bullet lists with "- ". You may use **bold** sparingly for key numbers. When comparing properties, use one short bullet per property like "- Downtown Office (#1): 250 mUSDC/share, 0% sold, $2.5M". Avoid long paragraphs.`;
 
 const tools: Anthropic.Tool[] = [
   {

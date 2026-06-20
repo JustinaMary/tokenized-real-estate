@@ -13,6 +13,62 @@ import { Button, Spinner } from "./ui";
 type Msg = { role: "user" | "assistant"; content: string };
 type Action = { name: string; input: Record<string, unknown> } | null;
 
+/** Render inline **bold** within a line. */
+function inline(text: string, key: number) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+  return (
+    <span key={key}>
+      {parts.map((p, i) =>
+        p.startsWith("**") && p.endsWith("**") ? (
+          <strong key={i} className="font-semibold text-fg">
+            {p.slice(2, -2)}
+          </strong>
+        ) : (
+          <span key={i}>{p}</span>
+        )
+      )}
+    </span>
+  );
+}
+
+/** Minimal markdown: paragraphs, "- " bullets, **bold**. No tables. */
+function MessageText({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const out: React.ReactNode[] = [];
+  let bullets: string[] = [];
+  const flush = () => {
+    if (bullets.length) {
+      out.push(
+        <ul key={out.length} className="ml-4 list-disc space-y-1">
+          {bullets.map((b, i) => (
+            <li key={i}>{inline(b, i)}</li>
+          ))}
+        </ul>
+      );
+      bullets = [];
+    }
+  };
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      flush();
+      continue;
+    }
+    if (line.startsWith("- ") || line.startsWith("* ")) {
+      bullets.push(line.slice(2));
+    } else {
+      flush();
+      out.push(
+        <p key={out.length} className="leading-relaxed">
+          {inline(line, 0)}
+        </p>
+      );
+    }
+  }
+  flush();
+  return <div className="space-y-2">{out}</div>;
+}
+
 export function AgentWidget() {
   const { address } = useAccount();
   const [open, setOpen] = useState(false);
@@ -169,7 +225,7 @@ export function AgentWidget() {
                     : "bg-bg-elev text-fg-muted"
                 }`}
               >
-                {m.content}
+                {m.role === "assistant" ? <MessageText text={m.content} /> : m.content}
               </div>
             ))}
 
