@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@getpara/evm-wallet-connectors": "^3.3.0",
+    "@getpara/react-sdk": "^3.3.0",
     "@neondatabase/serverless": "^1.1.0",
     "@tanstack/react-query": "^5.101.0",
     "next": "16.2.9",

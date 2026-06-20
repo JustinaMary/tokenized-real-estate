@@ -1,5 +1,6 @@
 import { MockUSDCABI, PropertySharesABI, MarketplaceABI } from "./abis";
-import type { Address } from "viem";
+
+type Hex = `0x${string}`;
 
 /**
  * Deployed contract addresses. Set these in `.env.local` after running the
@@ -7,9 +8,9 @@ import type { Address } from "viem";
  * (NEXT_PUBLIC_) because the frontend reads/writes them directly.
  */
 export const addresses = {
-  mockUSDC: (process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS ?? "") as Address,
-  propertyShares: (process.env.NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS ?? "") as Address,
-  marketplace: (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS ?? "") as Address,
+  mockUSDC: (process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS ?? "") as Hex,
+  propertyShares: (process.env.NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS ?? "") as Hex,
+  marketplace: (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS ?? "") as Hex,
 } as const;
 
 export const isConfigured =

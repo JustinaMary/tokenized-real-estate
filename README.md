@@ -111,12 +111,33 @@ Import `web/` as a Vercel project. Set the env vars above (and add a Neon
 integration for `DATABASE_URL`). The Next.js API routes deploy as serverless
 functions — no separate backend.
 
-## Notes & roadmap
+## Auth: email / social / passkey (Para)
 
-- **Auth:** ships with injected-wallet connect. To add email/social/passkey
-  sign-in, layer Para's `ParaProvider` on the same Wagmi config (monskill
-  `wallet-integration` skill).
-- **Stretch:** Envio HyperIndex activity feed, IPFS metadata pinning,
-  permissioned multi-issuer support.
+Para is **already wired in** ([app/providers-para.tsx](web/app/providers-para.tsx),
+[components/ParaConnectButton.tsx](web/components/ParaConnectButton.tsx)) with
+Monad testnet on `externalWalletConfig`. It activates automatically once a Para
+API key is present; without one the app falls back to injected-wallet connect, so
+it always runs.
+
+To switch on email/social/passkey sign-in:
+
+```bash
+npm install -g @getpara/cli
+para login                 # browser OAuth — only you can complete this
+cd web && para init --no-input
+para keys create -n terra-dev --display-name "Terra (dev)"
+# put the PUBLIC key in web/.env.local:
+#   NEXT_PUBLIC_PARA_API_KEY=<public-key>
+para doctor                # verify the integration
+npm run dev
+```
+
+The header button becomes **Sign in** and opens the Para modal (Google, Apple,
+Discord, X, Facebook, Farcaster, email, passkey, or external wallet).
+
+## Roadmap
+
+- Envio HyperIndex activity feed, IPFS metadata pinning, permissioned
+  multi-issuer support.
 
 _Demo only — not investment advice._

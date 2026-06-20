@@ -16,7 +16,7 @@ export default function FaucetPage() {
   const { data: usdcBal, refetch } = useReadContract({
     ...mockUSDC,
     functionName: "balanceOf",
-    args: address ? [address] : undefined,
+    args: address ? [address as `0x${string}`] : undefined,
     query: { enabled: !!address },
   });
 

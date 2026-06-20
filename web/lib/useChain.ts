@@ -3,6 +3,8 @@
 import { useReadContract, useReadContracts } from "wagmi";
 import { propertyShares, marketplace } from "./contracts";
 
+const asAddr = (a?: string) => (a ? (a as `0x${string}`) : undefined);
+
 export type OnchainProperty = {
   supply: bigint;
   pricePerShare: bigint;
@@ -51,23 +53,25 @@ export function usePropertyOnchain(id: number) {
 }
 
 /** A user's share balance for a property. */
-export function useShareBalance(id: number, address?: `0x${string}`) {
+export function useShareBalance(id: number, address?: string) {
+  const addr = asAddr(address);
   const { data, refetch } = useReadContract({
     ...propertyShares,
     functionName: "balanceOf",
-    args: address ? [address, BigInt(id)] : undefined,
-    query: { enabled: !!address },
+    args: addr ? [addr, BigInt(id)] : undefined,
+    query: { enabled: !!addr },
   });
   return { balance: (data as bigint | undefined) ?? 0n, refetch };
 }
 
 /** Rent a user can currently claim for a property. */
-export function useClaimable(id: number, address?: `0x${string}`) {
+export function useClaimable(id: number, address?: string) {
+  const addr = asAddr(address);
   const { data, refetch } = useReadContract({
     ...propertyShares,
     functionName: "claimable",
-    args: address ? [BigInt(id), address] : undefined,
-    query: { enabled: !!address, refetchInterval: 10_000 },
+    args: addr ? [BigInt(id), addr] : undefined,
+    query: { enabled: !!addr, refetchInterval: 10_000 },
   });
   return { claimable: (data as bigint | undefined) ?? 0n, refetch };
 }
@@ -80,14 +84,15 @@ export type Holding = {
 };
 
 /** Batched balance + claimable + price across all properties for one address. */
-export function usePortfolio(address: `0x${string}` | undefined, count: number) {
+export function usePortfolio(address: string | undefined, count: number) {
+  const addr = asAddr(address);
   const { data, refetch } = useReadContracts({
     contracts: Array.from({ length: count }).flatMap((_, i) => [
-      { ...propertyShares, functionName: "balanceOf" as const, args: [address!, BigInt(i)] as const },
-      { ...propertyShares, functionName: "claimable" as const, args: [BigInt(i), address!] as const },
+      { ...propertyShares, functionName: "balanceOf" as const, args: [addr!, BigInt(i)] as const },
+      { ...propertyShares, functionName: "claimable" as const, args: [BigInt(i), addr!] as const },
       { ...propertyShares, functionName: "properties" as const, args: [BigInt(i)] as const },
     ]),
-    query: { enabled: !!address && count > 0, refetchInterval: 12_000 },
+    query: { enabled: !!addr && count > 0, refetchInterval: 12_000 },
   });
 
   const holdings: Holding[] = [];
