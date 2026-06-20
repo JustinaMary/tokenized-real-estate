@@ -4,6 +4,6 @@
  * always runs. Add NEXT_PUBLIC_PARA_API_KEY (from `para keys create`) to switch
  * on email / passkey / social sign-in.
  */
-export const PARA_API_KEY = process.env.NEXT_PUBLIC_PARA_API_KEY ?? "";
-export const isParaEnabled = PARA_API_KEY.length > 0;
+export const PARA_PUBLIC_API_KEY = process.env.NEXT_PUBLIC_PARA_API_KEY ?? "";
+export const isParaEnabled = PARA_PUBLIC_API_KEY.length > 0;
 export const PARA_APP_NAME = "Terra";

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "wagmi";
 import { useState, type ReactNode } from "react";
 import { monadTestnet } from "@/lib/chain";
-import { PARA_API_KEY, PARA_APP_NAME } from "@/lib/para";
+import { PARA_PUBLIC_API_KEY, PARA_APP_NAME } from "@/lib/para";
 
 /**
  * Para provider: embedded MPC wallets with email / passkey / social login, plus
@@ -19,7 +19,7 @@ export function ParaProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ParaProvider
-        paraClientConfig={{ apiKey: PARA_API_KEY, env: Environment.BETA }}
+        paraClientConfig={{ apiKey: PARA_PUBLIC_API_KEY, env: Environment.BETA }}
         config={{ appName: PARA_APP_NAME }}
         paraModalConfig={{
           oAuthMethods: ["GOOGLE", "APPLE", "DISCORD", "TWITTER", "FACEBOOK", "FARCASTER"],
