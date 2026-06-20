@@ -6,7 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "wagmi";
 import { useState, type ReactNode } from "react";
 import { monadTestnet } from "@/lib/chain";
-import { PARA_PUBLIC_API_KEY, PARA_APP_NAME } from "@/lib/para";
+import {
+  PARA_PUBLIC_API_KEY,
+  PARA_APP_NAME,
+  WALLETCONNECT_PROJECT_ID,
+} from "@/lib/para";
 
 /**
  * Para provider: embedded MPC wallets with email / passkey / social login, plus
@@ -30,6 +34,12 @@ export function ParaProviders({ children }: { children: ReactNode }) {
           recoverySecretStepEnabled: true,
         }}
         externalWalletConfig={{
+          // Email/passkey embedded wallet AND external-wallet connect, both on
+          // Monad testnet. WalletConnect needs a project id (free, cloud.reown.com)
+          // — included only when set so injected wallets still work without it.
+          ...(WALLETCONNECT_PROJECT_ID
+            ? { walletConnect: { projectId: WALLETCONNECT_PROJECT_ID } }
+            : {}),
           evmConnector: {
             config: {
               chains: [monadTestnet],
