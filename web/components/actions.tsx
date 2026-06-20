@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAccount } from "wagmi";
 import { maxUint256 } from "viem";
 import { mockUSDC, propertyShares, marketplace } from "@/lib/contracts";
 import { useTx } from "@/lib/useTx";
 import { useUsdcAllowance, useIsApprovedForAll } from "@/lib/useAllowance";
+import { useCompliance } from "@/lib/useCompliance";
 import { formatUSDC, parseUSDC } from "@/lib/format";
 import { Button, Input, Field } from "./ui";
 import type { OnchainProperty, Listing } from "@/lib/useChain";
@@ -63,11 +65,11 @@ export function BuyPrimaryBox({
         <span className="text-fg-muted">Total cost</span>
         <span className="tabular font-semibold text-accent">{formatUSDC(cost)} mUSDC</span>
       </div>
-      <ConnectGate>
+      <VerifyGate>
         <Button className="w-full" onClick={onBuy} loading={isBusy} disabled={shares <= 0n || shares > remaining}>
           {allowance < cost ? "Approve & Buy" : "Buy shares"}
         </Button>
-      </ConnectGate>
+      </VerifyGate>
     </div>
   );
 }
@@ -183,7 +185,8 @@ export function BuyListingButton({
   listing: Listing;
   onDone?: () => void;
 }) {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { isVerified } = useCompliance(address);
   const { run, isBusy } = useTx();
   const { allowance, refetch } = useUsdcAllowance(address, marketplace.address);
   const [amount, setAmount] = useState("");
@@ -221,11 +224,17 @@ export function BuyListingButton({
         onChange={(e) => setAmount(e.target.value)}
         className="w-32"
       />
-      <ConnectGate compact>
+      {!isConnected ? (
+        <span className="text-sm text-fg-faint">Connect wallet</span>
+      ) : !isVerified ? (
+        <Link href="/verify" className="text-sm text-gold hover:underline">
+          Verify to buy
+        </Link>
+      ) : (
         <Button onClick={onBuy} loading={isBusy}>
           Buy
         </Button>
-      </ConnectGate>
+      )}
     </div>
   );
 }
@@ -274,4 +283,34 @@ export function ConnectGate({
       Connect your wallet to continue
     </div>
   );
+}
+
+/**
+ * Gates an action behind wallet connection AND on-chain KYC/KYB verification.
+ * Unverified users see a prompt linking to the verification flow.
+ */
+export function VerifyGate({ children }: { children: React.ReactNode }) {
+  const { address, isConnected } = useAccount();
+  const { isVerified } = useCompliance(address);
+
+  if (!isConnected) {
+    return (
+      <div className="rounded-lg border border-border bg-bg-elev px-4 py-3 text-center text-sm text-fg-muted">
+        Connect your wallet to continue
+      </div>
+    );
+  }
+  if (!isVerified) {
+    return (
+      <div className="rounded-lg border border-gold/30 bg-gold/5 px-4 py-4 text-center">
+        <p className="text-sm text-fg-muted">
+          Identity verification is required to own property shares.
+        </p>
+        <Link href="/verify" className="mt-2 inline-block">
+          <Button>Verify to invest</Button>
+        </Link>
+      </div>
+    );
+  }
+  return <>{children}</>;
 }

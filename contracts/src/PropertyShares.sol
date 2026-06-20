@@ -7,6 +7,10 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+interface IComplianceRegistry {
+    function isVerified(address account) external view returns (bool);
+}
+
 /// @title PropertyShares
 /// @notice Each property is an ERC-1155 token id with a fixed share supply.
 ///         Rental income is distributed to holders via a pull-based dividend
@@ -27,6 +31,7 @@ contract PropertyShares is ERC1155, Ownable, ReentrancyGuard {
     }
 
     IERC20 public immutable usdc;
+    IComplianceRegistry public immutable registry;
     uint256 public nextId;
 
     mapping(uint256 => Property) public properties;
@@ -47,9 +52,11 @@ contract PropertyShares is ERC1155, Ownable, ReentrancyGuard {
     error InvalidAmount();
     error ExceedsSupply();
     error UnknownProperty();
+    error NotVerified();
 
-    constructor(address usdc_) ERC1155("") Ownable(msg.sender) {
+    constructor(address usdc_, address registry_) ERC1155("") Ownable(msg.sender) {
         usdc = IERC20(usdc_);
+        registry = IComplianceRegistry(registry_);
     }
 
     // --- Issuer actions ---
@@ -139,6 +146,11 @@ contract PropertyShares is ERC1155, Ownable, ReentrancyGuard {
         internal
         override
     {
+        // Compliance gate: only KYC/KYB-verified addresses may receive shares.
+        // Burns (to == 0) and the sender side are unaffected, so exits and rent
+        // claims stay open.
+        if (to != address(0) && !registry.isVerified(to)) revert NotVerified();
+
         uint256 len = ids.length;
         for (uint256 i = 0; i < len; i++) {
             if (from != address(0)) _harvest(ids[i], from);

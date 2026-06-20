@@ -5,11 +5,13 @@ import {Test} from "forge-std/Test.sol";
 import {MockUSDC} from "../src/MockUSDC.sol";
 import {PropertyShares} from "../src/PropertyShares.sol";
 import {Marketplace} from "../src/Marketplace.sol";
+import {ComplianceRegistry} from "../src/ComplianceRegistry.sol";
 
 contract MarketplaceTest is Test {
     MockUSDC usdc;
     PropertyShares shares;
     Marketplace market;
+    ComplianceRegistry registry;
 
     address issuer = makeAddr("issuer");
     address seller = makeAddr("seller");
@@ -20,9 +22,15 @@ contract MarketplaceTest is Test {
 
     function setUp() public {
         usdc = new MockUSDC();
+        registry = new ComplianceRegistry();
         vm.prank(issuer);
-        shares = new PropertyShares(address(usdc));
+        shares = new PropertyShares(address(usdc), address(registry));
         market = new Marketplace(address(usdc), address(shares));
+
+        // verify all participants so they can hold/receive shares
+        registry.setKyc(issuer, true);
+        registry.setKyc(seller, true);
+        registry.setKyc(buyer, true);
 
         _fund(issuer);
         _fund(seller);

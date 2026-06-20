@@ -99,8 +99,11 @@ mint mUSDC from the **Faucet**, then invest.
 | `NEXT_PUBLIC_MOCK_USDC_ADDRESS` | deployed MockUSDC |
 | `NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS` | deployed PropertyShares |
 | `NEXT_PUBLIC_MARKETPLACE_ADDRESS` | deployed Marketplace |
+| `NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS` | deployed ComplianceRegistry |
 | `NEXT_PUBLIC_MONAD_TESTNET_RPC_URL` | RPC (optional) |
 | `DATABASE_URL` | Neon Postgres (optional — falls back to a static seed) |
+| `VERIFIER_PRIVATE_KEY` | server-only; signer with `VERIFIER_ROLE`, funded with MON |
+| `BRALE_API_KEY` | server-only; optional, swaps mock KYC → Brale |
 
 The app runs fully without a database: property metadata falls back to a static
 seed keyed by token id. Connect Neon to persist issuer-created properties.
@@ -134,6 +137,26 @@ npm run dev
 
 The header button becomes **Sign in** and opens the Para modal (Google, Apple,
 Discord, X, Facebook, Farcaster, email, passkey, or external wallet).
+
+## Compliance: KYC / KYB
+
+Share ownership is gated on-chain. `ComplianceRegistry` is an identity allowlist
+(ERC-3643-style) tracking KYC (individuals) and KYB (businesses); `PropertyShares`
+checks it in `_update`, so **both primary buys and secondary trades require a
+verified recipient** — enforced at the token level, not just in the UI. Claiming
+rent and selling/exiting stay open.
+
+Flow: a user submits the `/verify` form → `POST /api/kyc/verify` runs a provider
+→ on approval, a backend signer (`VERIFIER_ROLE`) writes the result on-chain →
+the frontend reads status from the registry and unlocks investing.
+
+- **Provider:** mock by default (no real PII); set `BRALE_API_KEY` to switch to
+  Brale (regulated KYC/KYB + stablecoins, documented on Monad). The
+  `lib/kyc/provider.ts` interface lets any provider (TransFi, Banxa, zerohash…)
+  slot in.
+- **Setup:** set `VERIFIER_PRIVATE_KEY` (use the deployer key for the demo; it
+  already holds `VERIFIER_ROLE` and is verified by the deploy script) and
+  `NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS`. Keep the verifier key funded with MON.
 
 ## Roadmap
 

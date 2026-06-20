@@ -1,4 +1,9 @@
-import { MockUSDCABI, PropertySharesABI, MarketplaceABI } from "./abis";
+import {
+  MockUSDCABI,
+  PropertySharesABI,
+  MarketplaceABI,
+  ComplianceRegistryABI,
+} from "./abis";
 
 type Hex = `0x${string}`;
 
@@ -11,6 +16,7 @@ export const addresses = {
   mockUSDC: (process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS ?? "") as Hex,
   propertyShares: (process.env.NEXT_PUBLIC_PROPERTY_SHARES_ADDRESS ?? "") as Hex,
   marketplace: (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS ?? "") as Hex,
+  complianceRegistry: (process.env.NEXT_PUBLIC_COMPLIANCE_REGISTRY_ADDRESS ?? "") as Hex,
 } as const;
 
 export const isConfigured =
@@ -26,6 +32,10 @@ export const propertyShares = {
 export const marketplace = {
   address: addresses.marketplace,
   abi: MarketplaceABI,
+} as const;
+export const complianceRegistry = {
+  address: addresses.complianceRegistry,
+  abi: ComplianceRegistryABI,
 } as const;
 
 /** mUSDC uses 6 decimals. */

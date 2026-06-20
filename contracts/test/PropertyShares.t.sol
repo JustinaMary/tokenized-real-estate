@@ -4,22 +4,31 @@ pragma solidity ^0.8.28;
 import {Test} from "forge-std/Test.sol";
 import {MockUSDC} from "../src/MockUSDC.sol";
 import {PropertyShares} from "../src/PropertyShares.sol";
+import {ComplianceRegistry} from "../src/ComplianceRegistry.sol";
 
 contract PropertySharesTest is Test {
     MockUSDC usdc;
     PropertyShares shares;
+    ComplianceRegistry registry;
 
     address issuer = makeAddr("issuer"); // contract owner / property issuer
     address alice = makeAddr("alice");
     address bob = makeAddr("bob");
+    address carol = makeAddr("carol"); // unverified
 
     uint256 constant SUPPLY = 10_000;
     uint256 constant PRICE = 100 * 1e6; // 100 mUSDC per share
 
     function setUp() public {
         usdc = new MockUSDC();
+        registry = new ComplianceRegistry(); // this test contract is admin + verifier
         vm.prank(issuer);
-        shares = new PropertyShares(address(usdc));
+        shares = new PropertyShares(address(usdc), address(registry));
+
+        // verify participants (issuer must be verified to receive minted supply)
+        registry.setKyc(issuer, true);
+        registry.setKyc(alice, true);
+        registry.setKyc(bob, true);
 
         // fund participants
         _fund(issuer);
@@ -169,6 +178,55 @@ contract PropertySharesTest is Test {
         // alice keeps her pre-transfer rent; bob gets only post-transfer rent
         assertEq(shares.claimable(id, alice), aliceShareOfRent1);
         assertEq(shares.claimable(id, bob), bobShareOfRent2);
+    }
+
+    // --- compliance gating (transfers only) ---
+
+    function test_BuyPrimaryRevertsForUnverifiedBuyer() public {
+        uint256 id = _createProperty();
+        _fund(carol); // has mUSDC + approval, but not KYC-verified
+        vm.prank(carol);
+        vm.expectRevert();
+        shares.buyPrimary(id, 10);
+    }
+
+    function test_TransferToUnverifiedReverts() public {
+        uint256 id = _createProperty();
+        vm.prank(alice);
+        shares.buyPrimary(id, 100);
+        vm.prank(alice);
+        vm.expectRevert();
+        shares.safeTransferFrom(alice, carol, id, 10, "");
+    }
+
+    function test_BuyerCanReceiveOnceVerified() public {
+        uint256 id = _createProperty();
+        _fund(carol);
+        vm.prank(carol);
+        vm.expectRevert();
+        shares.buyPrimary(id, 10);
+
+        registry.setKyc(carol, true);
+        vm.prank(carol);
+        shares.buyPrimary(id, 10);
+        assertEq(shares.balanceOf(carol, id), 10);
+    }
+
+    function test_UnverifiedHolderCanStillClaimRent() public {
+        // alice (verified) buys, then accrues rent; even if later de-verified,
+        // claiming rent (a mUSDC transfer, not a share transfer) still works.
+        uint256 id = _createProperty();
+        vm.prank(alice);
+        shares.buyPrimary(id, 1000);
+        vm.prank(issuer);
+        shares.depositRent(id, 1000 * 1e6);
+
+        registry.setKyc(alice, false); // de-verify
+
+        uint256 balBefore = usdc.balanceOf(alice);
+        vm.prank(alice);
+        shares.claimRent(id); // share balance unchanged -> not gated
+        assertGt(usdc.balanceOf(alice), balBefore);
     }
 
     function test_TransferDoesNotStrandOrDoublePayRent() public {
