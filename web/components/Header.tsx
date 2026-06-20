@@ -7,7 +7,6 @@ import { ConnectButton } from "./ConnectButton";
 const NAV = [
   { href: "/", label: "Marketplace" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/activity", label: "Activity" },
   { href: "/verify", label: "Verify" },
   { href: "/issuer", label: "Issuer" },
   { href: "/faucet", label: "Faucet" },

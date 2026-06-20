@@ -8,6 +8,7 @@ import { formatUSDC, formatShares } from "@/lib/format";
 import { Card, Stat, Button } from "@/components/ui";
 import { ClaimButton, CancelListingButton } from "@/components/actions";
 import { ConfigBanner } from "@/components/ConfigBanner";
+import { ActivityFeed } from "@/components/ActivityFeed";
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
@@ -118,6 +119,10 @@ export default function DashboardPage() {
               })}
             </div>
           )}
+
+          {/* Activity */}
+          <h2 className="mt-10 mb-3 text-lg font-semibold">Recent activity</h2>
+          <ActivityFeed />
         </>
       )}
     </div>
