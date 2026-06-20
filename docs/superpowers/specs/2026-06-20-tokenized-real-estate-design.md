@@ -3,6 +3,7 @@
 **Date:** 2026-06-20
 **Event:** Monad Blitz Mumbai hackathon
 **Network:** Monad testnet (chainId `10143`)
+**Hosting:** Frontend + API routes on **Vercel**; Postgres on **Neon**; contracts on **Monad testnet**
 **Skill basis:** `monskill` scaffold (Foundry + OpenZeppelin, Next.js + shadcn + Wagmi v3, Para auth, Neon Postgres + IPFS)
 
 ## 1. Summary
@@ -49,11 +50,16 @@ tokenized-real-estate/
 
 What is on-chain vs off-chain:
 
-- **On-chain (trust + value):** share ownership (ERC-1155 balances), rent accounting
-  and claims, marketplace listings and settlement, mUSDC balances.
-- **Off-chain (convenience):** property descriptions/valuation/location, images,
-  user profiles, watchlists, search/filter/sort. Metadata JSON + images on IPFS,
-  referenced by URI on-chain; relational/queryable data in Postgres.
+- **On-chain backend (trust + value):** share ownership (ERC-1155 balances), rent
+  accounting and claims, marketplace listings and settlement, mUSDC balances.
+- **Off-chain backend (convenience):** there is **no standalone server**. The backend
+  is the set of **Next.js API routes** inside `web/`, deployed as **Vercel serverless
+  functions**, talking to **Neon Postgres**. Holds property descriptions/valuation/
+  location, images, user profiles, watchlists, search/filter/sort. Metadata JSON +
+  images on IPFS, referenced by URI on-chain; relational/queryable data in Postgres.
+
+The whole web app (UI + API routes) is one Vercel deployment. The chain stays the
+source of truth for ownership/rent/listings; Postgres is a convenience/index layer.
 
 ## 4. Smart contracts
 
@@ -133,6 +139,23 @@ Patterns:
 - Use `useSendTransactionSync` (Monad `eth_sendRawTransactionSync`) where applicable for snappy UX.
 - Monad-specific Para wagmi wiring (`monad` / `monadTestnet` chains) per `wallet-integration`.
 
+### 6.1 UI/UX quality bar
+
+The frontend is built through the `frontend-design` skill — genuine design quality,
+not generic AI-template look. Standards:
+
+- **Deliberate visual system:** committed aesthetic direction, consistent type scale,
+  intentional color (a real estate / fintech feel — trustworthy, premium), generous
+  spacing, a clear information hierarchy on every page.
+- **Polished components:** shadcn as the base, but styled — not default-grey cards.
+  Property cards with imagery, clear price/yield/ownership stats, progress bars for
+  shares sold.
+- **Motion + feedback:** smooth transitions, skeleton loaders on data fetch, optimistic
+  states and toasts on every tx, clear pending/success/error states.
+- **Responsive:** works on laptop (demo) and mobile; no horizontal overflow.
+- **Empty/edge states:** designed empty states (no holdings, no listings, no rent yet).
+- **Verification:** screenshot-checked during build before declaring a page done.
+
 ## 7. Error handling
 
 - Contracts: custom errors / `require` on supply caps, allowance/balance, listing
@@ -159,6 +182,18 @@ Patterns:
 6. Wire up Postgres (Neon) + seed properties; pin metadata/images to IPFS.
 7. Build frontend against deployed addresses; integrate Para (`wallet-integration`).
 8. Apply provenance markers; commit.
+
+## 9a. Deployment
+
+- **Contracts:** Monad testnet (10143) via agent wallet / Safe; verified via the
+  monskill verification API.
+- **Web app (UI + API routes):** **Vercel**. The Next.js app deploys as static/edge
+  assets + serverless functions in one project. Env vars on Vercel: `DATABASE_URL`
+  (Neon), Para keys, contract addresses, RPC URL.
+- **Database:** **Neon** serverless Postgres (native Vercel integration; connection
+  pooling for serverless).
+- **IPFS:** pin metadata JSON + images (e.g. via a pinning service) before referencing
+  URIs on-chain.
 
 ## 10. Out of scope (YAGNI for hackathon)
 
